@@ -1,15 +1,39 @@
-- name: generate snake svg
+name: generate animation
+
+on:
+  # Roda automaticamente a cada 12 horas
+  schedule:
+    - cron: "0 */12 * * *" 
+  
+  # Permite rodar manualmente na aba Actions
+  workflow_dispatch:
+  
+  # Roda a cada push na branch main
+  push:
+    branches:
+    - main
+
+jobs:
+  generate:
+    permissions: 
+      contents: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    steps:
+      # Gera o arquivo SVG da cobrinha com as cores personalizadas
+      - name: generate snake svg
         uses: Platane/snk/svg-only@v3
         with:
           github_user_name: devbiax
           outputs: |
             dist/snake.svg?color_snake=#e04486&color_dots=#333333,#b03a73,#e04486,#8e2d5c
 
+      # Pega o arquivo gerado e joga para a branch 'output'
       - name: push snake svg to github-pages
         uses: crazy-max/ghaction-github-pages@v3.1.0
         with:
-          target_branch: output # <-- Isso aqui tem que ser IGUAL ao link do README
+          target_branch: output
           build_dir: dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
